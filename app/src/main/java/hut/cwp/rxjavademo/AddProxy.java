@@ -12,9 +12,6 @@ public class AddProxy implements IAdd{
         this.mRemote = mRemote;
     }
 
-    public java.lang.String getInterfaceDescriptor() {
-        return DESCRIPTOR;
-    }
 
     @Override
     public void add(int a, int b) throws RemoteException {
@@ -30,14 +27,11 @@ public class AddProxy implements IAdd{
             reply.recycle();
             reply.recycle();
         }
-
     }
 
     @Override
     public IBinder asBinder() {
         return mRemote;
     }
-
-
 
 }

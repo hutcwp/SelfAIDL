@@ -20,8 +20,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.IInterface;
 import android.os.RemoteException;
 import android.util.Log;
+
+import static hut.cwp.rxjavademo.IAdd.DESCRIPTOR;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,8 +32,20 @@ public class MainActivity extends AppCompatActivity {
 
     ServiceConnection connection = new ServiceConnection() {
         @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            IAdd add = AddStub.asInterface(iBinder);
+        public void onServiceConnected(ComponentName componentName, IBinder obj) {
+            if (obj == null) {
+                return ;
+            }
+
+            IAdd add = null;
+            // 如果obj是代理类BinderProxy,obj.queryLocalInterface(DESCRIPTOR)会直接返回null
+            // 如果obj是Binder类，则会判断DESCRIPTOR字段是否相等，相等则返回attachInterface()方法中传入的对象，这里就是this
+            IInterface iin = obj.queryLocalInterface(DESCRIPTOR);
+            if ((iin instanceof IAdd)) {
+                add = (IAdd) iin;
+            }
+
+            add = new AddProxy(obj);
             try {
                 add.add(12, 2);
                 Log.d(TAG, "onServiceConnected: ");
